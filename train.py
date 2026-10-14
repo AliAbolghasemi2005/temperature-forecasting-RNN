@@ -25,3 +25,7 @@ plt.plot(range(len(temperature)), temperature)
 plt.show()
 plt.plot(range(1440), temperature[:1440])
 plt.show()
+
+num_train_samples = int(0.5 * len(raw_data))
+num_val_samples = int(0.25 * len(raw_data))
+num_test_samples = len(raw_data) - num_train_samples - num_val_samples
