@@ -2,6 +2,7 @@ import os
 import keras
 import numpy as np
 from matplotlib import pyplot as plt
+from keras import layers
 
 fname = os.path.join("jena_climate_2009_2016.csv")
 
@@ -85,3 +86,23 @@ def evaluate_naive_method(dataset):
 
 print(f"Baseline Validation MAE: {evaluate_naive_method(val_dataset):.2f}")
 print(f"Baseline Test MAE: {evaluate_naive_method(test_dataset):.2f}")
+
+inputs = keras.Input(shape=(sequence_length, raw_data.shape[-1]))
+x = layers.LSTM(16)(inputs)
+outputs = layers.Dense(1)(x)
+model = keras.Model(inputs, outputs)
+
+callbacks = [
+    keras.callbacks.ModelCheckpoint("temperature-forecasting-RNN.keras",
+        save_best_only=True)
+]
+
+model.compile(optimizer="rmsprop", loss="mse", metrics=["mae"])
+
+history = model.fit(train_dataset,
+    epochs=10,
+    validation_data=val_dataset,
+    callbacks=callbacks)
+
+model = keras.models.load_model("temperature-forecasting-RNN.keras")
+print(f"Test MAE: {model.evaluate(test_dataset)[1]:.2f}")
